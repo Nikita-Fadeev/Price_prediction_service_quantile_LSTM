@@ -2,16 +2,16 @@
 ## The task of maximizing sales with maximum margin.
 
 - A microservice client has been developed that offers a `price` for the combination of `dates`, `user_id`, and `SKU`. The service `price_service.ipynb` operates according to the following algorithm: 
-    1. A GET request receives data from the server with dates, `user_id`, and `SKU`. 
-    1. The price of the requested `SKU` product is selected for each user. 
+    1. A GET request receives data from the server with `date`, `user_id`, and `SKU`. 
+    1. The price of the requested `SKU` product is selected for each `user_id`. 
     1. A POST response publishes the proposed `prices`. 
-    1. The purchase fact is received by the service via a GET request, and the `update_reward` method is used to adjust the `price` selection function for each `user_id`.
+    1. The purchase fact `bougth` is received by the service via a GET request, and the `update_reward` method is used to adjust the `price` selection function for each `user_id`.
 - The service uses the `MultiArmBandit` algorithm to select prices for each `user_id` in accordance with maximum profit. Price selection is made from a discrete range of prices for each `SKU` product, calculated for each week. The `price` varies according to the 5th, 50th, and 95th percentiles of the `markup`.
 - The following pipeline was used to predict the `price` range `price_predictions.ipynb`: 
     1. Quantile LSTM models were trained for each `SKU` product on purchase quantity data. These models are capable of predicting the demand range. 
-    1. Quantile regression models were also built for each `SKU` product, describing the relationship between demand (purchase quantity) and markup for each `SKU` product. 
-    1. Knowing the purchase cost for the target dates (December 2019), discrete price ranges were predicted for each `SKU` product. 
-    1. For each week of December, for each `SKU` product, the 5th, 50th, and 95th percentiles of purchase quantity were predicted. Based on the purchase quantity, the 5th, 50th, and 95th percentiles of markup were found, and from the discrete range of markups and purchase costs for December, the price range for each product was determined `[price_pred_q5', price_pred_q50, price_pred_q95]`.
+    1. Quantile regression models were also built for each `SKU` product, describing the relationship between demand `num_purchase` (purchase quantity) and `markup` for each `SKU` product. 
+    1. Knowing the purchase `cost_price` for the target dates (December 2019), discrete `price` ranges were predicted for each `SKU` product. 
+    1. For each week of December, for each `SKU` product, the 5th, 50th, and 95th percentiles of purchase quantity were predicted. Based on the purchase quantity, the 5th, 50th, and 95th percentiles of `markup` were found, and from the discrete range of `markups` and purchase costs for December, the price range for each product was determined `[price_pred_q5', price_pred_q50, price_pred_q95]`.
 
 Notes:
 
@@ -20,7 +20,7 @@ Notes:
 - For building quantile LSTM models, a search for the length of time windows was conducted `SKU_lag[SKU]`. The search and selection were performed using the autocorrelation function. A suitable lag was considered a window where the module of the autocorrelation function was less than 0.1 divided by the number of counts.
 - Data on holidays `df_holidays` were used exclusively for visualization.
 - For `SKUs` for which it was not possible to build LSTM quantile regressions `SKUs_remain`, markups were obtained by averaging markups over a known period.
-- During the training of quantile LSTM models, the quality metric was the Intersection Over Union (IoU) coefficient—the ratio of the intersection area of the predicted and true purchase quantity range to the area of the figure describing these ranges. The true range equals the true value plus or minus the square root of the standard deviation of the purchase quantity for a specific `SKU` over the training period.
+- During the training of quantile LSTM models, the quality metric was the Intersection Over Union (IoU) coefficient—the ratio of the intersection area of the predicted and true purchase quantity range to the area of the figure describing these ranges. The true range equals the true value +- the square root of the standard deviation of the purchase quantity for a specific `SKU` over the training period.
 
 # Микросеврис для предложения цен 1000 SKU товаров по запросам пользователей. 
 ## Задача максимизации продаж с максимальной маржой.
